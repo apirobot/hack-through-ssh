@@ -6,7 +6,7 @@ Development Lead
 ----------------
 
 * Denis Orehovsky <denis.orehovsky@gmail.com>
-* Artem Matveev
+* Artem Matveev <andreygrin97@mail.ru>
 
 Contributors
 ------------
