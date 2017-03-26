@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 import sys
-import json
 import socket
 import argparse
 import threading
 import traceback
 
 import paramiko
+
+from helpers import get_server_info_from_json
 
 
 def create_parser():
@@ -34,11 +35,6 @@ class Server(paramiko.ServerInterface):
         if (username == self._username) and (password == self._password):
             return paramiko.AUTH_SUCCESSFUL
         return paramiko.AUTH_FAILED
-
-
-def get_server_info_from_json(json_file_path):
-    with open(json_file_path) as file_handler:
-        return json.load(file_handler)
 
 
 def main():
