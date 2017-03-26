@@ -94,8 +94,15 @@ def main():
             sys.exit(1)
         print 'Authenticated!'
 
-        print chan.recv(1024)
-        chan.send('Yes, I can see that!')
+        print 'Enter your shell commands:'
+        while True:
+            command = raw_input('$ ')
+            chan.send(command)
+            response = chan.recv(1024)
+            if response == 'exit':
+                chan.close()
+                break
+            print response
 
     except Exception as e:
         print '*** Caught exception: ' + str(e.__class__) + ': ' + str(e)
