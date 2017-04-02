@@ -55,10 +55,8 @@ class Client(BoxLayout):
             elif 'grab' in command:
                 try:
                     path = re.match(r'^grab (.*)$', command).group(1)
-                    t = threading.Thread(target=self._sftp,
-                                         args=(path,))
-                    t.start()
-                    chan.send('Successfully started copying')
+                    threading.Thread(target=self._sftp,
+                                     args=(path, chan)).start()
                 except:
                     chan.send('*** Error. Check paths')
             elif command == 'uname':
@@ -66,16 +64,17 @@ class Client(BoxLayout):
             else:
                 chan.send('*** Unrecognized command')
 
-    def _sftp(self, path):
-        transport = paramiko.Transport((self.hostname.text, 3373))
-        transport.connect(username='police', password='letmein')
-        sftp = paramiko.SFTPClient.from_transport(transport)
-        sftp.put(
-            os.path.join(os.getcwd(), path),
-            path,
-        )
-        sftp.close()
-        transport.close()
+    def _sftp(self, path, chan):
+        try:
+            with paramiko.Transport((self.hostname.text, 3373)) as transport:
+                transport.connect(username='police', password='letmein')
+                with paramiko.SFTPClient.from_transport(transport) as sftp:
+                    sftp.put(path, path)
+                    chan.send('Succesfully started copying')
+        except OSError:
+            chan.send('*** No such file or directory')
+        except Exception as e:
+            chan.send('*** Caught exception: %s: %s' % (e.__class__, e))
 
     def connect(self):
         t = threading.Thread(target=self._connect,
