@@ -29,6 +29,6 @@ def start_sftp_server(host, port, backlog, host_key):
                 traceback.print_exc()
                 sys.exit(1)
 
-            channel = transport.accept()
+            transport.accept()
             while transport.is_active():
                 time.sleep(1)

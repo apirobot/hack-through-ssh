@@ -40,6 +40,7 @@ def start_ssh_server(host, port, backlog, username, password, host_key):
             transport.start_server(server=server)
         except paramiko.SSHException:
             print '*** SSH negotiation failed'
+            traceback.print_exc()
             sys.exit(1)
 
         channel = transport.accept()
