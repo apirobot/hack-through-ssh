@@ -147,29 +147,16 @@ def main():
     args = parser.parse_args()
 
     server_info = get_server_info_from_json(args.json)
-    host_key = paramiko.RSAKey(filename=args.host_key)
+    for key in server_info.keys():
+        server_info[key]['host_key'] = paramiko.RSAKey(filename=args.host_key)
 
     try:
-        sftp_server_info = {
-            'host': server_info['hostname'],
-            'port': 3373,
-            'backlog': 10,
-            'host_key': host_key
-        }
         thread = threading.Thread(target=start_sftp_server,
-                                  kwargs=sftp_server_info)
+                                  kwargs=server_info['sftp'])
         thread.daemon = True
         thread.start()
 
-        ssh_server_info = {
-            'host': server_info['hostname'],
-            'username': server_info['username'],
-            'password': server_info['password'],
-            'port': 22,
-            'backlog': 1,
-            'host_key': host_key
-        }
-        start_ssh_server(**ssh_server_info)
+        start_ssh_server(**server_info['ssh'])
     except Exception as e:
         print '*** Caught exception: ' + str(e.__class__) + ': ' + str(e)
         traceback.print_exc()
