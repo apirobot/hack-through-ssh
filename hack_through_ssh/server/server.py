@@ -29,10 +29,10 @@ def main():
         server_info[key]['host_key'] = paramiko.RSAKey(filename=args.host_key)
 
     try:
-        thread = threading.Thread(target=start_sftp_server,
-                                  kwargs=server_info['sftp'])
-        thread.daemon = True
-        thread.start()
+        thread_for_sftp = threading.Thread(target=start_sftp_server,
+                                           kwargs=server_info['sftp'])
+        thread_for_sftp.daemon = True
+        thread_for_sftp.start()
 
         start_ssh_server(**server_info['ssh'])
     except Exception as e:
