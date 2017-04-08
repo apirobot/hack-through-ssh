@@ -6,8 +6,7 @@ import traceback
 
 import paramiko
 
-from _ssh import start_ssh_server
-from _sftp import start_sftp_server
+from base import SFTPServer, SSHServer
 from utils import get_server_info_from_json
 
 
@@ -29,12 +28,8 @@ def main():
         server_info[key]['host_key'] = paramiko.RSAKey(filename=args.host_key)
 
     try:
-        thread_for_sftp = threading.Thread(target=start_sftp_server,
-                                           kwargs=server_info['sftp'])
-        thread_for_sftp.daemon = True
-        thread_for_sftp.start()
-
-        start_ssh_server(**server_info['ssh'])
+        SFTPServer(**server_info['sftp']).run()
+        SSHServer(**server_info['ssh']).run()
     except Exception as e:
         print '*** Caught exception: ' + str(e.__class__) + ': ' + str(e)
         traceback.print_exc()

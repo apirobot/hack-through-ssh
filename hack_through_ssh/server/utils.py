@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-import sys
 import json
-import socket
-import traceback
+import threading
+import functools
 
 
 def get_server_info_from_json(json_file_path):
@@ -10,45 +9,30 @@ def get_server_info_from_json(json_file_path):
         return json.load(file_handler)
 
 
-def create_server_socket(host, port, backlog):
+def is_want_to_close():
+    while True:
+        answer = raw_input('Do you want to close the server? [y/n] ')
+        if answer == 'y' or answer == 'yes':
+            return True
+        elif answer == 'n' or answer == 'no':
+            return False
+
+
+def threaded(func=None, daemon=False):
     """
-    Creates a server socket that listening for connections.
+    Decorator that runs `func` in a separate thread.
 
-    :param backlog: the number of unaccepted connections that the system
-                    will allow before refusing new connections.
-    :type backlog: int
+    :param daemon: if `True` then thread stops if no alive non-daemon threads
+                   are left.
+    :type daemon: bool
+    :returns: created Thread object.
     """
-
-    try:
-        server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        server_socket.bind((host, port))
-    except Exception as e:
-        print '*** Bind failed: ' + str(e)
-        traceback.print_exc()
-        sys.exit(1)
-
-    try:
-        server_socket.listen(backlog)
-    except Exception as e:
-        print '*** Listen failed: ' + str(e)
-        traceback.print_exc()
-        sys.exit(1)
-
-    return server_socket
-
-
-def accept_connection_from_outside(server_socket):
-    """
-    Accepts a connection from outside.
-
-    :returns: (socket object, address info)
-    :rtype: tuple
-    """
-
-    try:
-        return server_socket.accept()
-    except Exception as e:
-        print '*** Accept failed: ' + str(e)
-        traceback.print_exc()
-        sys.exit(1)
+    def _outer_wrapper(func):
+        @functools.wraps(func)
+        def _wrapper(*args, **kwargs):
+            t = threading.Thread(target=func, args=args, kwargs=kwargs)
+            t.daemon = daemon
+            t.start()
+            return t
+        return _wrapper
+    return _outer_wrapper(func) if func is not None else _outer_wrapper
