@@ -217,6 +217,4 @@ class SSHServer:
 
     def show_connected_clients(self):
         print 'Connected clients to the server: '
-        for i, address in enumerate(self.connected_clients.keys()):
-            pass
         print '\n'.join(self.connected_clients.keys())
