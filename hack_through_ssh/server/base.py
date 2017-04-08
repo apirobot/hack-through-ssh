@@ -214,7 +214,6 @@ class SSHServer:
             else:
                 break
 
-
     def show_connected_clients(self):
         print 'Connected clients to the server: '
         print '\n'.join(self.connected_clients.keys())

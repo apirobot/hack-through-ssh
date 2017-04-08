@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import sys
 import argparse
-import threading
 import traceback
 
 import paramiko
