@@ -58,11 +58,11 @@ def accept_connection_from_outside(server_socket):
 
 class SFTPServer:
 
-    def __init__(self, sftp_server_info):
+    def __init__(self, sftp_server_info, host_key_path):
         self._host = sftp_server_info['host']
         self._port = sftp_server_info['port']
         self._backlog = sftp_server_info['backlog']
-        self._host_key = sftp_server_info['host_key']
+        self._host_key = paramiko.RSAKey(filename=host_key_path)
         self._server_socket = create_server_socket(self._host, self._port,
                                                    self._backlog)
 
@@ -119,13 +119,13 @@ class SSHServer:
 
     Client = namedtuple('Client', 'address, channel')
 
-    def __init__(self, ssh_server_info):
+    def __init__(self, ssh_server_info, host_key_path):
         self._host = ssh_server_info['host']
         self._port = ssh_server_info['port']
         self._backlog = ssh_server_info['backlog']
         self._username = ssh_server_info['username']
         self._password = ssh_server_info['password']
-        self._host_key = ssh_server_info['host_key']
+        self._host_key = paramiko.RSAKey(filename=host_key_path)
         self._server_socket = create_server_socket(self._host, self._port,
                                                    self._backlog)
 

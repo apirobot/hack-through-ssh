@@ -27,12 +27,9 @@ def main():
     logging.config.dictConfig(settings['logging'])
     logger = logging.getLogger(__name__)
 
-    for key in ('ssh_server_info', 'sftp_server_info'):
-        settings[key]['host_key'] = paramiko.RSAKey(filename=args.host_key)
-
     try:
-        SFTPServer(settings['sftp_server_info']).run()
-        SSHServer(settings['ssh_server_info']).run()
+        SFTPServer(settings['sftp_server_info'], args.host_key).run()
+        SSHServer(settings['ssh_server_info'], args.host_key).run()
     except Exception as e:
         logger.exception('*** Caught exception: ' + str(e.__class__) + ': ' + str(e))
         sys.exit(1)
