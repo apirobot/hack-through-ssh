@@ -1,0 +1,50 @@
+{
+
+  "ssh_server_info":
+  {
+    "host": "192.168.100.15",
+    "port": 22,
+    "backlog": 100,
+    "username": "police",
+    "password": "letmein"
+  },
+
+  "sftp_server_info":
+  {
+    "host": "192.168.100.15",
+    "port": 3373,
+    "backlog": 10
+  },
+
+  "logging":
+  {
+    "version": 1,
+    "disable_existing_loggers": false,
+    "formatters":
+    {
+      "simple":
+      {
+        "format": "%(asctime)s - %(levelname)s - %(message)s"
+      }
+    },
+
+    "handlers":
+    {
+      "console":
+      {
+        "class": "logging.StreamHandler",
+        "level": "INFO",
+        "formatter": "simple"
+      }
+    },
+
+    "loggers": {
+      "base": {
+        "level": "INFO",
+        "handlers": ["console"],
+        "propagate": "no"
+      }
+    }
+  }
+
+}

@@ -2,6 +2,7 @@
 import sys
 import time
 import socket
+import logging
 import threading
 import traceback
 from collections import namedtuple
@@ -10,6 +11,8 @@ import paramiko
 from sftpserver.stub_sftp import StubServer, StubSFTPServer
 
 from utils import threaded, is_want_to_close
+
+logger = logging.getLogger(__name__)
 
 
 def create_server_socket(host, port, backlog):
@@ -26,15 +29,13 @@ def create_server_socket(host, port, backlog):
         server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         server_socket.bind((host, port))
     except Exception as e:
-        print '*** Bind failed: ' + str(e)
-        traceback.print_exc()
+        logger.exception('*** Bind failed: ' + str(e))
         sys.exit(1)
 
     try:
         server_socket.listen(backlog)
     except Exception as e:
-        print '*** Listen failed: ' + str(e)
-        traceback.print_exc()
+        logger.exception('*** Listen failed: ' + str(e))
         sys.exit(1)
 
     return server_socket
@@ -51,8 +52,7 @@ def accept_connection_from_outside(server_socket):
     try:
         return server_socket.accept()
     except Exception as e:
-        print '*** Accept failed: ' + str(e)
-        traceback.print_exc()
+        logger.exception('*** Accept failed: ' + str(e))
         sys.exit(1)
 
 
@@ -70,8 +70,7 @@ class SFTPServer:
         try:
             self.authenticate_clients()
         except:
-            print '*** SFTP authentication failed'
-            traceback.print_exc()
+            logger.exception('*** SFTP authentication failed')
             sys.exit(1)
 
     @threaded(daemon=True)
@@ -90,8 +89,7 @@ class SFTPServer:
             try:
                 transport.start_server(server=server)
             except Exception as e:
-                print '*** SFTP negotiation failed: ' + str(e)
-                traceback.print_exc()
+                logger.exception('*** SFTP negotiation failed: ' + str(e))
                 sys.exit(1)
 
             channel = transport.accept()
@@ -135,18 +133,18 @@ class SSHServer:
         self.current_client = None
 
     def run(self):
+        logger.info('Listening for connections...')
+
         try:
             self.authenticate_clients()
         except:
-            print '*** SSH authentication failed'
-            traceback.print_exc()
+            logger.exception('*** SSH authentication failed')
             sys.exit(1)
 
         try:
             self.execute_shell_commands()
         except:
-            print '*** Execution of shell commands failed'
-            traceback.print_exc()
+            logger.exception('*** Execution of shell commands failed')
             sys.exit(1)
 
     @threaded(daemon=True)
@@ -155,7 +153,7 @@ class SSHServer:
             client_socket, address = accept_connection_from_outside(
                 self._server_socket)
 
-            print 'Got a connection from ' + str(address)
+            logger.info('Got a connection from ' + str(address))
 
             transport = paramiko.Transport(client_socket)
             transport.add_server_key(self._host_key)
@@ -164,16 +162,15 @@ class SSHServer:
             try:
                 transport.start_server(server=server)
             except paramiko.SSHException:
-                print '*** SSH negotiation failed'
-                traceback.print_exc()
+                logger.exception('*** SSH negotiation failed')
                 sys.exit(1)
 
             channel = transport.accept()
             if channel is None:
-                print '*** No channel'
+                logger.exception('*** No channel')
                 sys.exit(1)
 
-            print 'Authenticated!'
+            logger.info('Authenticated!')
             self.connected_clients.update({address[0]: channel})
 
     def execute_shell_commands(self):
@@ -209,11 +206,11 @@ class SSHServer:
                 self.current_client = self.Client(
                     address, self.connected_clients[address])
             except KeyError:
-                print 'Incorrect address'
+                logger.warning('Incorrect address')
                 continue
             else:
                 break
 
     def show_connected_clients(self):
-        print 'Connected clients to the server: '
-        print '\n'.join(self.connected_clients.keys())
+        logger.info('Connected clients to the server: ' + \
+                    ' ; '.join(self.connected_clients.keys()))

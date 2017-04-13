@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 import sys
 import argparse
-import traceback
+import logging
+import logging.config
 
 import paramiko
 
 from base import SFTPServer, SSHServer
-from utils import get_server_info_from_json
+from utils import get_info_from_json
 
 
 def create_parser():
     parser = argparse.ArgumentParser(description='Server')
-    parser.add_argument('json', help='path to the json file that '
-                                     'contains information about server '
-                                     '(hostname, username, password, ...)')
+    parser.add_argument('json', help='path to the json file that contains '
+                                     'server settings')
     parser.add_argument('host_key', help='path to the host key')
     return parser
 
@@ -22,16 +22,19 @@ def main():
     parser = create_parser()
     args = parser.parse_args()
 
-    server_info = get_server_info_from_json(args.json)
-    for key in server_info.keys():
-        server_info[key]['host_key'] = paramiko.RSAKey(filename=args.host_key)
+    settings = get_info_from_json(args.json)
+
+    logging.config.dictConfig(settings['logging'])
+    logger = logging.getLogger(__name__)
+
+    for key in ('ssh_server_info', 'sftp_server_info'):
+        settings[key]['host_key'] = paramiko.RSAKey(filename=args.host_key)
 
     try:
-        SFTPServer(server_info['sftp']).run()
-        SSHServer(server_info['ssh']).run()
+        SFTPServer(settings['sftp_server_info']).run()
+        SSHServer(settings['ssh_server_info']).run()
     except Exception as e:
-        print '*** Caught exception: ' + str(e.__class__) + ': ' + str(e)
-        traceback.print_exc()
+        logger.exception('*** Caught exception: ' + str(e.__class__) + ': ' + str(e))
         sys.exit(1)
 
 
