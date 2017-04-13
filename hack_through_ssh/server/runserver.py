@@ -4,8 +4,6 @@ import argparse
 import logging
 import logging.config
 
-import paramiko
-
 from base import SFTPServer, SSHServer
 from utils import get_info_from_json
 
@@ -31,7 +29,8 @@ def main():
         SFTPServer(settings['sftp_server_info'], args.host_key).run()
         SSHServer(settings['ssh_server_info'], args.host_key).run()
     except Exception as e:
-        logger.exception('*** Caught exception: ' + str(e.__class__) + ': ' + str(e))
+        logger.exception('*** Caught exception: ' + str(e.__class__) +
+                         ': ' + str(e))
         sys.exit(1)
 
 

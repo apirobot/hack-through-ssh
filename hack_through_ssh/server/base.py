@@ -4,7 +4,6 @@ import time
 import socket
 import logging
 import threading
-import traceback
 from collections import namedtuple
 
 import paramiko
@@ -212,5 +211,5 @@ class SSHServer:
                 break
 
     def show_connected_clients(self):
-        logger.info('Connected clients to the server: ' + \
+        logger.info('Connected clients to the server: ' +
                     ' ; '.join(self.connected_clients.keys()))
