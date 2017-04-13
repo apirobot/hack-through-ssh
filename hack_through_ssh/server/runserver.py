@@ -27,8 +27,8 @@ def main():
         server_info[key]['host_key'] = paramiko.RSAKey(filename=args.host_key)
 
     try:
-        SFTPServer(**server_info['sftp']).run()
-        SSHServer(**server_info['ssh']).run()
+        SFTPServer(server_info['sftp']).run()
+        SSHServer(server_info['ssh']).run()
     except Exception as e:
         print '*** Caught exception: ' + str(e.__class__) + ': ' + str(e)
         traceback.print_exc()
