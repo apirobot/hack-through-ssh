@@ -1,6 +1,7 @@
 paramiko==2.1.2
-sftpserver==0.2
 pycrypto==2.6.1
 ecdsa==0.13
-cython==0.25.2
 kivy==1.9.1
+
+sftpserver==0.2
+pyyaml==3.12

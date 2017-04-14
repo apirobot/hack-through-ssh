@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
-import json
 import threading
 import functools
 
+import yaml
 
-def get_info_from_json(json_file_path):
-    with open(json_file_path) as file_handler:
-        return json.load(file_handler)
+
+def get_info_from_yaml(yaml_file_path):
+    with open(yaml_file_path) as file_handler:
+        return yaml.load(file_handler)
 
 
 def is_want_to_close():
