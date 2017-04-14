@@ -3,5 +3,5 @@ pycrypto==2.6.1
 ecdsa==0.13
 kivy==1.9.1
 
-sftpserver==0.2
+sftpserver==0.3
 pyyaml==3.12
