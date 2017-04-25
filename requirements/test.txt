@@ -1,0 +1,4 @@
+-r base.txt
+
+pytest==3.0.7
+mock==2.0.0
