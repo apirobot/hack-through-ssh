@@ -26,7 +26,7 @@ Builder.load_string('''
 
 class Client(BoxLayout):
 
-    def _connect(self, hostname, port=22,
+    def _connect(self, hostname, port=2222,
                  username='police', password='letmein'):
         client = paramiko.SSHClient()
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
